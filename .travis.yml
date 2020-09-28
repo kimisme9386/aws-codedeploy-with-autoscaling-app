@@ -1,0 +1,25 @@
+language: php
+os: linux
+
+php:
+  - 7.4
+
+cache:
+  directories:
+    - $HOME/.composer/cache/files
+
+before_install:
+  - mv ./.env.testing ./.env
+
+install:
+  - composer install --prefer-dist
+
+script:
+  - composer run test
+
+notifications:
+  email: false
+  slack:
+    on_success: never
+    rooms:
+      secure: "d9opjVnTB06RT/F4p8V0sgbd3J2XHaDQzqbM7MesJtTL4+5gXSr6B4wJisxwwM9QuJKebWCivBN8J5N8Bz5NRNDRISl57rQsgVoqolsuH9y70GEOcDyAeToRjzlNpXce6Pmo8kEjVKndE8tAQcmKNfNSFKFoN4Xc3eLUoBjzCfLK2bnAohMdP0zZro0TLXooYDPXu6n02SUBSpTKWUyj8XXwHzgAnoX4nQD6UyGmS90sv93wEqxsL2UpuhkgEcHDhRrUQyjyGdQT0wY4QFWhnEC0LAozIu/vMSXZ8RnEMd36GDs//i7N0EFCepUq4v754YByWCJEf2ewxqpDdYZbYBhjbBJs3ySbSI1xcrjlNLu0ctGnSnzrTVuivqBVAiCeOa34K0FnabsNRQoXsUXgO3H+zJQubEMvsU9Un3hC4xLiA86Pi2OX0FkKbLa3gLcnAFYwwEtt+1gULIq9kt7ZlBpzKo/RzjbGWCQVJO7W+m72aN8Hd/dBNjFlMnI57GKY6pQuAxnt6V7dyMTYfLLjo5RksKwhHXo+Gvy+VU7wTW8IB/LNVJRCKqQaGDX6KrfCuONDh2xBgqxthIpc4KS6Lsqkvgb9UoAtPiEKVF2+06QfAF4t7Zd67SXXIsZsPi7oRdevNStxtAbWh7a4jYffCz2vRUFkljPq5/gsrByK7Yg="
