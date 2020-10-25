@@ -4,6 +4,10 @@ os: linux
 php:
   - 7.4
 
+env:
+  global:
+    - DEPLOY_REGION=ap-northeast-1
+
 cache:
   directories:
     - $HOME/.composer/cache/files
@@ -23,3 +27,30 @@ notifications:
     on_success: never
     rooms:
       secure: "d9opjVnTB06RT/F4p8V0sgbd3J2XHaDQzqbM7MesJtTL4+5gXSr6B4wJisxwwM9QuJKebWCivBN8J5N8Bz5NRNDRISl57rQsgVoqolsuH9y70GEOcDyAeToRjzlNpXce6Pmo8kEjVKndE8tAQcmKNfNSFKFoN4Xc3eLUoBjzCfLK2bnAohMdP0zZro0TLXooYDPXu6n02SUBSpTKWUyj8XXwHzgAnoX4nQD6UyGmS90sv93wEqxsL2UpuhkgEcHDhRrUQyjyGdQT0wY4QFWhnEC0LAozIu/vMSXZ8RnEMd36GDs//i7N0EFCepUq4v754YByWCJEf2ewxqpDdYZbYBhjbBJs3ySbSI1xcrjlNLu0ctGnSnzrTVuivqBVAiCeOa34K0FnabsNRQoXsUXgO3H+zJQubEMvsU9Un3hC4xLiA86Pi2OX0FkKbLa3gLcnAFYwwEtt+1gULIq9kt7ZlBpzKo/RzjbGWCQVJO7W+m72aN8Hd/dBNjFlMnI57GKY6pQuAxnt6V7dyMTYfLLjo5RksKwhHXo+Gvy+VU7wTW8IB/LNVJRCKqQaGDX6KrfCuONDh2xBgqxthIpc4KS6Lsqkvgb9UoAtPiEKVF2+06QfAF4t7Zd67SXXIsZsPi7oRdevNStxtAbWh7a4jYffCz2vRUFkljPq5/gsrByK7Yg="
+
+before_deploy:
+  - composer install --optimize-autoloader --no-dev
+  - mkdir -p .CodeDeploy
+  - zip -rq .CodeDeploy/latest.zip app bootstrap database public resources routes storage vendor appspec.yml scripts .env
+
+deploy:
+  - provider: s3
+    access_key_id: &aws_access_id_key
+      secure: "PeQ+z1zYvVAdIpqc7HVPyjLNFg1eC85WMVWKz367GSxrFiSZOh9teYoXXvF822ETM8C5kpvNWyov2MSBTDHBaaVbSJ+voodotgD0qDQeQpCYH0OhJdnRCdPwyeyzw1vnZMYr4GTt4gq9N+LyfalSRM+sw9B6WsJZSiMxQPQJUUSne5BW/pNGO24kDKsMcp1q/Mgv62fZzUwqROlkYcdJSBgq3wKiyNLWjCxAT6aC7dcuItpW4Z9W/sJtQOYuJOTG1c6HbqR6X4V1Pkm+unGzCPRBZhpFKqQorQIbv1sNk9YJ1HtBT84WOrO0+N6HEf+4kV3TXJczJvjuGMxfDbQfin/jl+FbF28DQ3hclgSKsAL1of4Npm8xA9aUNr8zXtrZLfTvooYomR6wxCl8aAhRVHyOUW88U+NAY5Lgh5TGxUC1xnq5C56lJ/8+XVyz5yuP0SV7IL45kku1ytqA4FPDF7KGeuVV7f78XgEKp2c9tnL2Pw5VRWRGxuP96K/0HZvuxJhIt98vvG0b3KLZGsWhzcRneCPLGsLw4UhKHNNiVoTcEXYbf0CYO+gqjXtO5zVcx6Twq4f0UB4B8tNTRlZpeaSBJA0kV4oCG6vRf1WUVyCqIjCuBlTwrQQHQNVbMZgjbD6GigXYfEzuG2fy6IDqYrO+NtOD2RjA6Yv/aSTeXd8="
+    secret_access_key: &aws_secret_key
+      secure: "OdSKBE9Hvv6YxoQatw58lfp1Po8sGFXncd0UX2fjo08i2Aj4YtI8CBhW9+63rAEz9yJmVK1Flh9kjJCFZkHBK1vLYFj330Mtil8iwKqZgLyKnUlQ5a1z7eWqRNEROfqyfxA+G/7e5r9fBjq3vEk2dmvUyZ7PR6yBC2YRTZKuFRNl062k9bYYGIwqWG8sUMgcsubMmoaOFpTLRfQoR2Mer4qefMAu51+prYUu7VoIJuiixoAd3Vut13HriWg06p/xIVzXPG5xK/GoJDeMuLrvG7MTirLwHEBzR2t9chrnc6jZoix8NuGjKMYhDfOTEK286pakrLUT0l+AHVENfOvaQQmvWS2ZVcgLcZOgGaFc6DsW2wuCYIYE9jPFzTn5ubGqskpChsn1xdaL224gBeZGw2RpQdbTY77Y1TjYwvCuMge3LvZIZmMdt+jjYf1EhuIjEBxig2wDsMwVHcF3k7P+5gKUUdaN0J67lGa7nV9JA/bF26I0kC6czJwXn753uFTWQE5b5GI9AO95p2U/gzRMsf0nPvDSTdnzHlYBKGwrP2DTDodZmtNs4W/VdQhW/ic12XeTeZwmbjzXo7HU8Bbn6OB2gX9Z118WMtppQ/71rka3E9xtm1aLhI4ek1Ozk1QqzCHfExQ9M3MJGWrAwsKOOGm+4tnu83Tzd1Dsc178Jbo="
+    bucket: &deployment_bucket awscodedeploywithautosca-codedeploymentbucket072a-12haa0c9sd5da
+    local_dir: .CodeDeploy
+    skip_cleanup: true
+    region: ${DEPLOY_REGION}
+    on: &deploy_branch
+      branch: master
+  - provider: codedeploy
+    access_key_id: *aws_access_id_key
+    secret_access_key: *aws_secret_key
+    bucket: *deployment_bucket
+    key: latest.zip
+    application: LumenApp
+    deployment_group: Master
+    region: ${DEPLOY_REGION}
+    on: *deploy_branch
